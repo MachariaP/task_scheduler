@@ -82,6 +82,15 @@ class Database:
                 params.append(status)
             query += " ORDER BY priority ASC, due_date ASC"
             return conn.execute(query, params).fetchall()
+        
+    def get_task_by_id(self, task_id: int) -> tuple:
+        """
+        Fetch a task by its ID.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+            return cursor.fetchone()
 
     def update_task_status(self, task_id: int, status: str) -> None:
         """
