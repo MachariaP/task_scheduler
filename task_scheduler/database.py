@@ -17,6 +17,18 @@ class Database:
         self.db_path = db_path
         self._create_tables()
 
+        with sqlite3.connect(db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS task (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    priority INTEGER NOT NULL CHECK(priority BETWEEN 1 AND 10),
+                    due_date TEXT NOT NULL,
+                    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed'))
+                    category TEXT DEFAULT 'general' CHECK(category IN ('general', 'work', 'personal'))
+                )
+            """)
+
     def _create_tables(self) -> None:
         """Create the tasks table if it doesn't exist."""
         with sqlite3.connect(self.db_path) as conn:
