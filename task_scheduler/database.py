@@ -87,7 +87,7 @@ class Database:
             List[Tuple]: List of tasks as (id, name, priority, due_date, status).
         """
         with sqlite3.connect(self.db_path) as conn:
-            query = "SELECT id, name, priority, due_date, status FROM tasks"
+            query = "SELECT id, name, priority, due_date, category FROM tasks"
             params = []
             if status:
                 query += " WHERE status = ?"

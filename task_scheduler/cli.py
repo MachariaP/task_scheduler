@@ -56,12 +56,14 @@ def list_tasks(console: Console, db: Database) -> None:
     table.add_column("Name", style="green")
     table.add_column("Priority", style="yellow", justify="right")
     table.add_column("Due Date", style="blue")
+    table.add_column("Category", style="bright_cyan")
     table.add_column("Status", style="white")
 
     for task in tasks:
         status_style = "[green]" if task[4] == "pending" else "[red]"
         table.add_row(
-            str(task[0]), task[1], str(task[2]), task[3], f"{status_style}{task[4]}[/]"
+            str(task[0]), task[1], str(task[2]), task[3], task[5],
+            f"{status_style}{task[4]}[/]"
         )
 
     console.print(table)
