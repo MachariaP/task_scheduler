@@ -102,6 +102,27 @@ def delete_task(console: Console, db: Database) -> None:
         else:
             console.print(f"[red]Task {task_id} not found.[/red]")
 
+def view_task_details(console: Console, db: Database) -> None:
+    """Display detailed information for a single task."""
+    console.print("[bold blue]View Task Details[/bold blue]")
+    task_id = IntPrompt.ask("Task ID")
+    task = db.get_task_by_id(task_id)
+
+    if not task:
+        console.print(f"[red]Task {task_id} not found.[/red]")
+        return
+    
+    panel = panel(
+        f"[cyan]ID:[/cyan] {task['id']}\n"
+        f"[green]Name:[/green] {task['name']}\n"
+        f"[yellow]Priority:[/yellow] {task['priority']}\n"
+        f"[blue]Due Date:[/blue] {task['due_date']}\n"
+        f"[white]Status:[/white] {task['status']}",
+        title=f"Task {task_id}",
+        border_style="bright_blue"
+    )
+    console.print(panel)
+
 
 def run_scheduler(console: Console, scheduler: Scheduler) -> None:
     """Execute the scheduler for pending tasks."""
