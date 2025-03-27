@@ -5,9 +5,11 @@ from rich.console import Console
 from rich.table import Table
 from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.panel import Panel
+from rich.progress import Progress
 from task_scheduler.database import Database
 from datetime import datetime
 from task_scheduler.scheduler import Scheduler
+import heapq
 
 
 def display_menu(console: Console) -> None:
@@ -127,7 +129,19 @@ def view_task_details(console: Console, db: Database) -> None:
 def run_scheduler(console: Console, scheduler: Scheduler) -> None:
     """Execute the scheduler for pending tasks."""
     console.print("[bold cyan]Starting Scheduler[/bold cyan]")
-    scheduler.run()
+    queue = scheduler.build_queue()
+    if not queue:
+        console.print("[yellow]No pending tasks.[/yellow]")
+        return
+    
+    with Progress() as progress:
+        task_bar = progress.add_task("[cyan]Processing tasks...", total=len(queue))
+
+        while queue:
+            priority, due_ts, task_id = heapq.heappop(queue)
+            name = scheduler.db.get_tasks(task_id=task_id)[0][1]
+            scheduler._execute_task(task_id, name)
+            progress.update(task_bar, advance=1)
 
 
 def main() -> None:
