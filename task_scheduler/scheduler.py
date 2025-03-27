@@ -4,6 +4,8 @@ import heapq
 import logging
 import random
 import time
+import smtplib
+from email.mime.text import MIMEText
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import List, Tuple
@@ -26,16 +28,27 @@ class Scheduler:
         self.db = Database(db_path)
         self.max_workers = max_workers
 
+
     def _execute_task(self, task_id: int, name: str) -> None:
-        """Simulate task execution and update status."""
         logging.info(f"Starting task {task_id}: {name}")
         try:
-            time.sleep(random.uniform(1, 5))  # Simulate work
+            time.sleep(random.uniform(1, 5))
             self.db.update_task_status(task_id, "completed")
             logging.info(f"Completed task {task_id}: {name}")
+            self.send_email(f"Task {name} completed", "Success!")
         except Exception as e:
             self.db.update_task_status(task_id, "failed")
             logging.error(f"Failed task {task_id}: {name} - {e}")
+            self.send_email(f"Task {name} failed", f"Error: {e}")
+
+    def send_email(subject: str, body: str) -> None:
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"] = "your_email@example.com"
+        msg["To"] = "your_email@example.com"
+        with smtplib.SMTP("smtp.example.com") as server:
+            server.login("username", "password")
+            server.send_message(msg)
 
     def build_queue(self) -> List[Tuple[int, float, int]]:
         """Build priority queue from pending tasks."""
