@@ -1,6 +1,7 @@
 """Command-line interface for the task scheduler."""
 
 import sys
+import json
 from rich.console import Console
 from rich.table import Table
 from rich.prompt import Prompt, IntPrompt, Confirm
@@ -150,8 +151,10 @@ def run_scheduler(console: Console, scheduler: Scheduler) -> None:
 def main() -> None:
     """Run the interactive CLI or fallback to legacy commands."""
     console = Console()
+    with open("config.json", "r") as f:
+        config = json.load(f)
     db = Database()
-    scheduler = Scheduler()
+    scheduler = Scheduler(max_workers=config["max_workers"])
 
     # Fallback to legacy CLI if arguments are provided
     if len(sys.argv) > 1:
