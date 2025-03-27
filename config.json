@@ -1,0 +1,5 @@
+{
+    "max_workers": 3,
+    "default_category": "General",
+    "theme": "dark"
+}
