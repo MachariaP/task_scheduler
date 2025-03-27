@@ -6,6 +6,7 @@ from rich.table import Table
 from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.panel import Panel
 from task_scheduler.database import Database
+from datetime import datetime
 from task_scheduler.scheduler import Scheduler
 
 
@@ -27,12 +28,27 @@ def display_menu(console: Console) -> None:
 
 
 def list_tasks(console: Console, db: Database) -> None:
-    """Show all tasks in a colorful, formatted table."""
+    """Show all tasks with filtering and sorting options."""
     tasks = db.get_tasks()
     if not tasks:
         console.print("[yellow]No tasks available.[/yellow]")
         return
+    
+    console.print("[blue]List Options:[/blue]")
+    filter_choice = Prompt.ask("Filter by status (all, pending, completed, failed)", default="pending")
+    sort_choice = Prompt.ask("Sort by (id, priority, due_date)", default="id")
 
+    # Filter tasks
+    if filter_choice != "all":
+        task = [t for t in tasks if t[4] == filter_choice]
+
+    # Sort tasks
+    if sort_choice == "priority":
+        tasks.sort(key=lambda x: x[2])
+    elif sort_choice == "due_date":
+        tasks.sort(key=lambda x: datetime.strptime(x[3], "%Y-%m-%d %H:%M"))
+
+    # Display tasks in a table
     table = Table(title="Your Tasks", show_header=True, header_style="bold magenta")
     table.add_column("ID", style="cyan", justify="right")
     table.add_column("Name", style="green")
