@@ -73,9 +73,10 @@ def add_task(console: Console, db: Database) -> None:
     name = Prompt.ask("Task Name")
     priority = IntPrompt.ask("Priority (1-10)", default=5, choices=[str(i) for i in range(1, 11)])
     due_date = Prompt.ask("Due Date (YYYY-MM-DD HH:MM)", default="2025-03-28 09:00")
+    category = Prompt.ask("Category", default="General")
 
     try:
-        task_id = db.add_task(name, priority, due_date)
+        task_id = db.add_task(name, priority, due_date, category=category)
         console.print(f"[green]Success! Task added with ID: {task_id}[/green]")
     except ValueError as e:
         console.print(f"[red]Oops: {e}[/red]")
