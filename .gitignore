@@ -7,4 +7,5 @@ env/
 venv/
 .venv/
 *.db
-scheduler.log
+*.log
+.env
